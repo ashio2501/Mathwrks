@@ -63,13 +63,11 @@
 
 /* Quiz action buttons container */
 .quiz-actions {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
+  justify-content: center;
   gap: 16px;
-  z-index: 100;
+  margin-top: 24px;
+  padding: 20px 0;
 }
 
 /* Challenge Me button */
