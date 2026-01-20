@@ -426,16 +426,14 @@
 
 /* Bored button */
 .bored-button {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
   padding: 16px 24px;
   background: linear-gradient(135deg, #818CF8, #6366F1);
   color: white;
   border-radius: 30px;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
   font-weight: 600;
-  z-index: 100;
+  font-size: 16px;
+  transition: all 0.2s ease;
 }
 
 .bored-button:hover {

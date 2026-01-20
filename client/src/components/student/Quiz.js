@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStudent } from '../../context/StudentContext';
 import { quizApi, puzzleApi } from '../../services/api';
@@ -23,6 +23,7 @@ function Quiz() {
   const [acknowledged, setAcknowledged] = useState(false);
   const [puzzle, setPuzzle] = useState(null);
   const [showPuzzle, setShowPuzzle] = useState(false);
+  const [challengeMessage, setChallengeMessage] = useState(null);
 
   const difficultyInfo = useAdaptive(session?.currentDifficulty || 1);
 
@@ -51,6 +52,7 @@ function Quiz() {
     setAcknowledged(false);
     setShowPuzzle(false);
     setPuzzle(null);
+    setChallengeMessage(null);
 
     try {
       const data = await quizApi.getNext(sessionId);
@@ -121,6 +123,26 @@ function Quiz() {
     }
   };
 
+  const handleChallengeClick = async () => {
+    try {
+      const data = await quizApi.challenge(sessionId);
+      setChallengeMessage(data.message);
+
+      if (data.success) {
+        setSession(prev => ({
+          ...prev,
+          currentDifficulty: data.currentDifficulty
+        }));
+        // Load a new question at the higher difficulty
+        setTimeout(() => {
+          loadNextQuestion();
+        }, 1500);
+      }
+    } catch (err) {
+      console.error('Failed to increase difficulty:', err);
+    }
+  };
+
   const closePuzzle = () => {
     setShowPuzzle(false);
   };
@@ -172,6 +194,12 @@ function Quiz() {
         </button>
       </div>
 
+      {challengeMessage && (
+        <div className="challenge-message">
+          {challengeMessage}
+        </div>
+      )}
+
       {question && (
         <Question
           question={question}
@@ -194,8 +222,14 @@ function Quiz() {
         <FunPuzzle puzzle={puzzle} onClose={closePuzzle} />
       )}
 
+      {/* Bottom action buttons */}
       {question && !result && (
-        <BoredButton onClick={handleBoredClick} />
+        <div className="quiz-actions">
+          <button className="challenge-button" onClick={handleChallengeClick}>
+            🚀 Challenge Me!
+          </button>
+          <BoredButton onClick={handleBoredClick} />
+        </div>
       )}
     </div>
   );

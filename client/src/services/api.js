@@ -73,6 +73,9 @@ export const quizApi = {
     method: 'POST',
   }),
   getStatus: (sessionId) => fetchApi(`/quiz/${sessionId}/status`),
+  challenge: (sessionId) => fetchApi(`/quiz/${sessionId}/challenge`, {
+    method: 'POST',
+  }),
 };
 
 // Puzzle API

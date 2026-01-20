@@ -401,4 +401,57 @@ router.get('/:sessionId/status', (req, res) => {
   }
 });
 
+// Challenge Me - manually increase difficulty
+router.post('/:sessionId/challenge', (req, res) => {
+  const { sessionId } = req.params;
+
+  try {
+    const session = db.prepare('SELECT * FROM quiz_sessions WHERE id = ?').get(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    if (session.ended_at) {
+      return res.status(400).json({ error: 'Session has ended' });
+    }
+
+    // Get current progress
+    const progress = db.prepare(
+      'SELECT * FROM student_module_progress WHERE student_id = ? AND module_id = ?'
+    ).get(session.student_id, session.module_id);
+
+    if (!progress) {
+      return res.status(404).json({ error: 'Progress not found' });
+    }
+
+    // Check if already at max difficulty
+    if (progress.current_difficulty >= 3) {
+      return res.json({
+        success: false,
+        message: "You're already at the hardest level!",
+        currentDifficulty: 3,
+        difficultyLabel: 'Hard'
+      });
+    }
+
+    // Increase difficulty by 1
+    const newDifficulty = progress.current_difficulty + 1;
+
+    db.prepare(`
+      UPDATE student_module_progress
+      SET current_difficulty = ?, correct_streak = 0, wrong_streak = 0
+      WHERE student_id = ? AND module_id = ?
+    `).run(newDifficulty, session.student_id, session.module_id);
+
+    res.json({
+      success: true,
+      message: `Difficulty increased to ${getDifficultyLabel(newDifficulty)}!`,
+      currentDifficulty: newDifficulty,
+      difficultyLabel: getDifficultyLabel(newDifficulty)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
