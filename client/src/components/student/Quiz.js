@@ -218,18 +218,18 @@ function Quiz() {
         />
       )}
 
-      {/* Action buttons - show after answering */}
+      {showPuzzle && puzzle && (
+        <FunPuzzle puzzle={puzzle} onClose={closePuzzle} />
+      )}
+
+      {/* Sticky action bar - appears after answering */}
       {result && !showPuzzle && (
-        <div className="quiz-actions">
+        <div className="sticky-action-bar">
           <button className="challenge-button" onClick={handleChallengeClick}>
             🚀 Challenge Me!
           </button>
           <BoredButton onClick={handleBoredClick} />
         </div>
-      )}
-
-      {showPuzzle && puzzle && (
-        <FunPuzzle puzzle={puzzle} onClose={closePuzzle} />
       )}
     </div>
   );
