@@ -1,58 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStudent } from '../../context/StudentContext';
-import { studentApi } from '../../services/api';
 import './StudentEntry.css';
 
 function StudentEntry() {
   const navigate = useNavigate();
-  const { student, selectStudent, createStudent, loading: studentLoading } = useStudent();
-  const [students, setStudents] = useState([]);
-  const [newName, setNewName] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, login, register, loading: studentLoading } = useStudent();
+
+  const [mode, setMode] = useState('login'); // 'login' or 'register'
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState(null);
-  const [showNewForm, setShowNewForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (student) {
+    if (isAuthenticated) {
       navigate('/modules');
     }
-  }, [student, navigate]);
+  }, [isAuthenticated, navigate]);
 
-  useEffect(() => {
-    loadStudents();
-  }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
 
-  const loadStudents = async () => {
     try {
-      const data = await studentApi.getAll();
-      setStudents(data);
+      if (mode === 'login') {
+        await login(username, password);
+      } else {
+        await register(username, password, name);
+      }
+      navigate('/modules');
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const handleSelectStudent = (selectedStudent) => {
-    selectStudent(selectedStudent);
-    navigate('/modules');
-  };
-
-  const handleCreateStudent = async (e) => {
-    e.preventDefault();
-    if (!newName.trim()) return;
-
+  const switchMode = () => {
+    setMode(mode === 'login' ? 'register' : 'login');
     setError(null);
-    try {
-      await createStudent(newName.trim());
-      navigate('/modules');
-    } catch (err) {
-      setError(err.message);
-    }
+    setUsername('');
+    setPassword('');
+    setName('');
   };
 
-  if (studentLoading || loading) {
+  if (studentLoading) {
     return (
       <div className="loading">
         <div className="spinner"></div>
@@ -64,71 +59,102 @@ function StudentEntry() {
     <div className="student-entry">
       <div className="page-header">
         <h1>Welcome to MathWrks!</h1>
-        <p>Select your name or create a new account to start learning</p>
+        <p>
+          {mode === 'login'
+            ? 'Sign in to continue your learning journey'
+            : 'Create an account to start learning'}
+        </p>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      <div className="auth-card card">
+        <div className="auth-tabs">
+          <button
+            className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
+            onClick={() => switchMode()}
+            disabled={mode === 'login'}
+          >
+            Sign In
+          </button>
+          <button
+            className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
+            onClick={() => switchMode()}
+            disabled={mode === 'register'}
+          >
+            Create Account
+          </button>
+        </div>
 
-      {!showNewForm ? (
-        <>
-          {students.length > 0 && (
-            <div className="student-list">
-              <h3>Choose Your Name</h3>
-              <div className="student-grid">
-                {students.map((s) => (
-                  <button
-                    key={s.id}
-                    className="student-card"
-                    onClick={() => handleSelectStudent(s)}
-                  >
-                    <span className="student-avatar">
-                      {s.name.charAt(0).toUpperCase()}
-                    </span>
-                    <span className="student-info">
-                      <span className="student-name">{s.name}</span>
-                      <span className="student-points">⭐ {s.total_points} pts</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        {error && <div className="error-message">{error}</div>}
 
-          <div className="new-student-section">
-            <button
-              className="btn-primary new-student-btn"
-              onClick={() => setShowNewForm(true)}
-            >
-              + I'm New Here
-            </button>
-          </div>
-        </>
-      ) : (
-        <div className="new-student-form card">
-          <h3>Create Your Account</h3>
-          <form onSubmit={handleCreateStudent}>
+        <form onSubmit={handleSubmit}>
+          {mode === 'register' && (
             <div className="form-group">
-              <label htmlFor="name">What's your name?</label>
+              <label htmlFor="name">Display Name</label>
               <input
                 id="name"
                 type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Enter your name..."
-                autoFocus
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="What should we call you?"
+                required
               />
             </div>
-            <div className="form-buttons">
-              <button type="button" className="btn-secondary" onClick={() => setShowNewForm(false)}>
-                Back
+          )}
+
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              autoFocus
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={mode === 'register' ? 'At least 6 characters' : 'Enter your password'}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn-primary submit-btn"
+            disabled={submitting || !username || !password || (mode === 'register' && !name)}
+          >
+            {submitting
+              ? (mode === 'login' ? 'Signing in...' : 'Creating account...')
+              : (mode === 'login' ? 'Sign In' : 'Create Account')}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          {mode === 'login' ? (
+            <p>
+              Don't have an account?{' '}
+              <button className="link-btn" onClick={switchMode}>
+                Create one
               </button>
-              <button type="submit" className="btn-primary" disabled={!newName.trim()}>
-                Start Learning!
+            </p>
+          ) : (
+            <p>
+              Already have an account?{' '}
+              <button className="link-btn" onClick={switchMode}>
+                Sign in
               </button>
-            </div>
-          </form>
+            </p>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

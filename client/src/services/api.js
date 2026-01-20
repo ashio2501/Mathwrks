@@ -11,10 +11,16 @@ async function fetchApi(endpoint, options = {}) {
     ...options,
   };
 
-  // Add auth token if available
-  const token = localStorage.getItem('teacherToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Add student token if available
+  const studentToken = localStorage.getItem('studentToken');
+  if (studentToken) {
+    config.headers.Authorization = `Bearer ${studentToken}`;
+  }
+
+  // Override with teacher token for teacher routes
+  const teacherToken = localStorage.getItem('teacherToken');
+  if (teacherToken && (endpoint.startsWith('/teacher') || endpoint.startsWith('/auth'))) {
+    config.headers.Authorization = `Bearer ${teacherToken}`;
   }
 
   const response = await fetch(url, config);
@@ -27,13 +33,22 @@ async function fetchApi(endpoint, options = {}) {
   return data;
 }
 
-// Student API
+// Student Auth API
 export const studentApi = {
-  getAll: () => fetchApi('/students'),
-  create: (name) => fetchApi('/students', {
+  register: (username, password, name) => fetchApi('/students/register', {
     method: 'POST',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ username, password, name }),
   }),
+  login: (username, password) => fetchApi('/students/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  }),
+  getMe: () => {
+    const token = localStorage.getItem('studentToken');
+    return fetchApi('/students/me', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  },
   getById: (id) => fetchApi(`/students/${id}`),
   getProgress: (id) => fetchApi(`/students/${id}/progress`),
 };
@@ -67,7 +82,7 @@ export const puzzleApi = {
   getAll: () => fetchApi('/puzzles'),
 };
 
-// Auth API
+// Teacher Auth API
 export const authApi = {
   login: (username, password) => fetchApi('/auth/login', {
     method: 'POST',

@@ -1,43 +1,136 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const db = require('../data/database');
 
-// Get all students
-router.get('/', (req, res) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'mathwrks-student-secret-2024';
+
+// Student registration
+router.post('/register', (req, res) => {
+  const { username, password, name } = req.body;
+
+  if (!username || !password || !name) {
+    return res.status(400).json({ error: 'Username, password, and name are required' });
+  }
+
+  if (username.length < 3) {
+    return res.status(400).json({ error: 'Username must be at least 3 characters' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
   try {
-    const students = db.prepare('SELECT id, name, total_points FROM students ORDER BY name').all();
-    res.json(students);
+    const existing = db.prepare('SELECT id FROM students WHERE username = ?').get(username.toLowerCase());
+    if (existing) {
+      return res.status(400).json({ error: 'Username already taken' });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const result = db.prepare(
+      'INSERT INTO students (username, password_hash, name) VALUES (?, ?, ?)'
+    ).run(username.toLowerCase(), passwordHash, name.trim());
+
+    const student = db.prepare(
+      'SELECT id, username, name, total_points FROM students WHERE id = ?'
+    ).get(result.lastInsertRowid);
+
+    const token = jwt.sign(
+      { id: student.id, username: student.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      token,
+      student: {
+        id: student.id,
+        username: student.username,
+        name: student.name,
+        total_points: student.total_points
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Create a new student
-router.post('/', (req, res) => {
-  const { name } = req.body;
+// Student login
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
 
-  if (!name || !name.trim()) {
-    return res.status(400).json({ error: 'Name is required' });
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
   }
 
   try {
-    const existing = db.prepare('SELECT id FROM students WHERE name = ?').get(name.trim());
-    if (existing) {
-      return res.status(400).json({ error: 'Student name already exists' });
+    const student = db.prepare(
+      'SELECT * FROM students WHERE username = ?'
+    ).get(username.toLowerCase());
+
+    if (!student) {
+      return res.status(401).json({ error: 'Invalid username or password' });
     }
 
-    const result = db.prepare('INSERT INTO students (name) VALUES (?)').run(name.trim());
-    const student = db.prepare('SELECT id, name, total_points FROM students WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(student);
+    const validPassword = bcrypt.compareSync(password, student.password_hash);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const token = jwt.sign(
+      { id: student.id, username: student.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      student: {
+        id: student.id,
+        username: student.username,
+        name: student.name,
+        total_points: student.total_points
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify token and get current student
+router.get('/me', (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: 'No authorization header' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const student = db.prepare(
+      'SELECT id, username, name, total_points FROM students WHERE id = ?'
+    ).get(decoded.id);
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    res.json(student);
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid token' });
   }
 });
 
 // Get student by ID
 router.get('/:id', (req, res) => {
   try {
-    const student = db.prepare('SELECT id, name, total_points FROM students WHERE id = ?').get(req.params.id);
+    const student = db.prepare(
+      'SELECT id, username, name, total_points FROM students WHERE id = ?'
+    ).get(req.params.id);
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -50,7 +143,9 @@ router.get('/:id', (req, res) => {
 // Get student progress with module breakdown
 router.get('/:id/progress', (req, res) => {
   try {
-    const student = db.prepare('SELECT id, name, total_points FROM students WHERE id = ?').get(req.params.id);
+    const student = db.prepare(
+      'SELECT id, username, name, total_points FROM students WHERE id = ?'
+    ).get(req.params.id);
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -89,16 +184,6 @@ router.get('/:id/progress', (req, res) => {
       moduleProgress,
       quizHistory
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get all modules
-router.get('/modules/list', (req, res) => {
-  try {
-    const modules = db.prepare('SELECT id, name, display_name, description, icon FROM modules').all();
-    res.json(modules);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

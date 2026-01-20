@@ -8,49 +8,55 @@ export function StudentProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved student in localStorage
-    const savedStudentId = localStorage.getItem('studentId');
-    if (savedStudentId) {
-      loadStudent(savedStudentId);
+    // Check for saved token
+    const token = localStorage.getItem('studentToken');
+    if (token) {
+      verifyToken();
     } else {
       setLoading(false);
     }
   }, []);
 
-  const loadStudent = async (id) => {
+  const verifyToken = async () => {
     try {
-      const data = await studentApi.getById(id);
+      const data = await studentApi.getMe();
       setStudent(data);
-      localStorage.setItem('studentId', id);
     } catch (error) {
-      console.error('Failed to load student:', error);
-      localStorage.removeItem('studentId');
+      console.error('Token verification failed:', error);
+      localStorage.removeItem('studentToken');
     } finally {
       setLoading(false);
     }
   };
 
-  const selectStudent = async (studentData) => {
-    setStudent(studentData);
-    localStorage.setItem('studentId', studentData.id);
+  const login = async (username, password) => {
+    const data = await studentApi.login(username, password);
+    localStorage.setItem('studentToken', data.token);
+    setStudent(data.student);
+    return data;
   };
 
-  const createStudent = async (name) => {
-    const newStudent = await studentApi.create(name);
-    setStudent(newStudent);
-    localStorage.setItem('studentId', newStudent.id);
-    return newStudent;
+  const register = async (username, password, name) => {
+    const data = await studentApi.register(username, password, name);
+    localStorage.setItem('studentToken', data.token);
+    setStudent(data.student);
+    return data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('studentToken');
+    setStudent(null);
   };
 
   const refreshStudent = async () => {
     if (student) {
-      await loadStudent(student.id);
+      try {
+        const data = await studentApi.getMe();
+        setStudent(data);
+      } catch (error) {
+        console.error('Failed to refresh student:', error);
+      }
     }
-  };
-
-  const clearStudent = () => {
-    setStudent(null);
-    localStorage.removeItem('studentId');
   };
 
   const updatePoints = (points) => {
@@ -66,10 +72,11 @@ export function StudentProvider({ children }) {
     <StudentContext.Provider value={{
       student,
       loading,
-      selectStudent,
-      createStudent,
+      isAuthenticated: !!student,
+      login,
+      register,
+      logout,
       refreshStudent,
-      clearStudent,
       updatePoints
     }}>
       {children}

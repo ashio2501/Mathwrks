@@ -7,7 +7,7 @@ import './Navigation.css';
 
 function Navigation() {
   const location = useLocation();
-  const { student, clearStudent } = useStudent();
+  const { student, logout: studentLogout } = useStudent();
   const { isAuthenticated, logout } = useAuth();
 
   const isTeacherRoute = location.pathname.startsWith('/teacher');
@@ -25,8 +25,8 @@ function Navigation() {
             <>
               <PointsDisplay points={student.total_points} />
               <span className="student-name">{student.name}</span>
-              <button className="nav-btn" onClick={clearStudent}>
-                Switch User
+              <button className="nav-btn" onClick={studentLogout}>
+                Logout
               </button>
             </>
           )}

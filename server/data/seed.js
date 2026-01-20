@@ -156,9 +156,11 @@ insertPuzzle.run(12, 'Divisibility Detective', 'What is the smallest positive nu
 const passwordHash = bcrypt.hashSync('teacherpass', 10);
 db.prepare('INSERT INTO teachers (username, password_hash) VALUES (?, ?)').run('teacher', passwordHash);
 
-// Seed some sample students
-db.prepare('INSERT INTO students (name, total_points) VALUES (?, ?)').run('Alex', 150);
-db.prepare('INSERT INTO students (name, total_points) VALUES (?, ?)').run('Jordan', 200);
+// Seed some sample students (username, password, name)
+const studentPassword = bcrypt.hashSync('password123', 10);
+db.prepare('INSERT INTO students (username, password_hash, name, total_points) VALUES (?, ?, ?, ?)').run('alex', studentPassword, 'Alex', 150);
+db.prepare('INSERT INTO students (username, password_hash, name, total_points) VALUES (?, ?, ?, ?)').run('jordan', studentPassword, 'Jordan', 200);
 
 console.log('Database seeded successfully!');
 console.log('Default teacher login: username="teacher", password="teacherpass"');
+console.log('Sample student logins: username="alex" or "jordan", password="password123"');
