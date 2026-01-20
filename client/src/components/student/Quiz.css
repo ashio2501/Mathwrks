@@ -1,0 +1,38 @@
+.quiz-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.session-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.module-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.quiz-completed {
+  padding: 48px;
+}
+
+.quiz-completed h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.quiz-completed p {
+  color: var(--text-secondary);
+  font-size: 18px;
+}

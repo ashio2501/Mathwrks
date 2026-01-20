@@ -1,0 +1,282 @@
+.summary-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.summary-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.grade-emoji {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.summary-header h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.summary-header .module-name {
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+.points-earned {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border-radius: 12px;
+  margin: 24px 0;
+}
+
+.points-icon {
+  font-size: 32px;
+}
+
+.points-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: #92400E;
+}
+
+.total-points {
+  text-align: center;
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.answers-review {
+  margin-top: 32px;
+  text-align: left;
+}
+
+.answers-review h3 {
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.answer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--background);
+}
+
+.answer-item.correct {
+  border-left: 4px solid var(--success);
+}
+
+.answer-item.incorrect {
+  border-left: 4px solid var(--error);
+}
+
+.answer-number {
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 32px;
+}
+
+.answer-details {
+  flex: 1;
+}
+
+.answer-question {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.answer-info {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.answer-status {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.answer-item.correct .answer-status {
+  color: var(--success);
+}
+
+.answer-item.incorrect .answer-status {
+  color: var(--error);
+}
+
+.summary-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.summary-actions button {
+  width: 100%;
+}
+
+/* Puzzle modal styles */
+.puzzle-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.puzzle-modal {
+  background: var(--surface);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.puzzle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.puzzle-header h2 {
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--text);
+}
+
+.puzzle-content {
+  padding: 24px;
+}
+
+.puzzle-content h3 {
+  margin-bottom: 16px;
+  color: var(--primary-dark);
+}
+
+.puzzle-concept {
+  margin: 16px 0;
+}
+
+.hint-btn, .solution-btn {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.puzzle-solution {
+  background: #D1FAE5;
+  border: 2px solid var(--success);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.puzzle-solution h5 {
+  color: var(--success-dark);
+  margin-bottom: 8px;
+}
+
+.puzzle-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+}
+
+.puzzle-footer button {
+  width: 100%;
+}
+
+/* Additional styles for concept explanation */
+.result-section {
+  margin-top: 24px;
+}
+
+.difficulty-change {
+  background: #EBF4FF;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.answer-explanation {
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.acknowledgment-section textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.input-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.acknowledged-section {
+  padding: 20px;
+  background: #D1FAE5;
+  border-radius: 8px;
+}
+
+/* Question card additions */
+.question-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.potential-points {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.question-concept {
+  margin-bottom: 16px;
+}
+
+.submit-btn {
+  width: 100%;
+}

@@ -1,0 +1,98 @@
+.student-entry {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.student-list {
+  margin-bottom: 32px;
+}
+
+.student-list h3 {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.student-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.student-card:hover {
+  border-color: var(--primary);
+  transform: translateX(4px);
+}
+
+.student-avatar {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.student-info .student-name {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.student-info .student-points {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.new-student-section {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.new-student-btn {
+  padding: 16px 32px;
+  font-size: 18px;
+}
+
+.new-student-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.new-student-form h3 {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.form-buttons button {
+  flex: 1;
+}

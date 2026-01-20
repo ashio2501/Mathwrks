@@ -1,0 +1,46 @@
+.teacher-login {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.login-card {
+  padding: 32px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header h1 {
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  color: var(--text-secondary);
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.login-hint {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.login-hint p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.login-hint code {
+  background: var(--background);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
